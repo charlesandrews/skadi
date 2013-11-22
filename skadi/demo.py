@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import bz2
 import collections as c
 import copy
 import io as _io
@@ -235,7 +236,12 @@ class Stream(object):
 
 class Demo(object):
   def __init__(self, abspath):
-    infile = _io.open(abspath, 'r+b')
+    if hasattr(abspath, "read"):
+        infile = abspath
+    elif abspath.lower().endswith(".bz2"):
+        infile = bz2.BZ2File(abspath, "r")
+    else:
+        infile = _io.open(abspath, 'r+b')
     if infile.read(8) != "PBUFDEM\0":
       raise InvalidDemo('malformed header')
 
